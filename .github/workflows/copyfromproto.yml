@@ -21,20 +21,36 @@ jobs:
           repository: Ayaz-26/ProtoHax-Android
           path: protohax
       
+      - name: Debug - Check ProtoHax Structure
+        run: |
+          echo "=== ProtoHax Directory Structure ==="
+          ls -la protohax/
+          echo ""
+          echo "=== ProtoHax App Structure ==="
+          ls -la protohax/app/src/main/ 2>/dev/null || echo "App directory not found"
+          echo ""
+          echo "=== ProtoHax Java Structure ==="
+          ls -la protohax/app/src/main/java/ 2>/dev/null || echo "Java directory not found"
+      
       - name: Copy UI Files
         run: |
+          # Create necessary directories first
+          mkdir -p nova/app/src/main/res/layout
+          mkdir -p nova/app/src/main/res/values
+          mkdir -p nova/app/src/main/res/drawable
+          mkdir -p nova/app/src/main/java/com/radiantbyte/novaclient/ui
+          
           # Copy layout files
-          cp -r protohax/app/src/main/res/layout/* nova/app/src/main/res/layout/
+          cp -r protohax/app/src/main/res/layout/* nova/app/src/main/res/layout/ 2>/dev/null || true
           
           # Copy values (themes, colors)
-          cp -r protohax/app/src/main/res/values/* nova/app/src/main/res/values/
+          cp -r protohax/app/src/main/res/values/* nova/app/src/main/res/values/ 2>/dev/null || true
           
           # Copy drawables
           cp -r protohax/app/src/main/res/drawable/* nova/app/src/main/res/drawable/ 2>/dev/null || true
           
           # Copy UI source code
-          mkdir -p nova/app/src/main/java/com/radiantbyte/novaclient/ui
-          cp -r protohax/app/src/main/java/dev/sora/protohax/ui/* nova/app/src/main/java/com/radiantbyte/novaclient/ui/
+          cp -r protohax/app/src/main/java/dev/sora/protohax/ui/* nova/app/src/main/java/com/radiantbyte/novaclient/ui/ 2>/dev/null || true
       
       - name: Update Package Names
         run: |

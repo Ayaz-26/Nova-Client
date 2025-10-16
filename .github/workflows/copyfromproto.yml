@@ -1,0 +1,96 @@
+name: Copy ProtoHax UI to Nova
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  copy-ui:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Nova Client
+        uses: actions/checkout@v3
+        with:
+          repository: Ayaz-26/Nova-Client
+          path: nova
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Checkout ProtoHax
+        uses: actions/checkout@v3
+        with:
+          repository: Ayaz-26/ProtoHax-Android
+          path: protohax
+      
+      - name: Copy UI Files
+        run: |
+          # Copy layout files
+          cp -r protohax/app/src/main/res/layout/* nova/app/src/main/res/layout/
+          
+          # Copy values (themes, colors)
+          cp -r protohax/app/src/main/res/values/* nova/app/src/main/res/values/
+          
+          # Copy drawables
+          cp -r protohax/app/src/main/res/drawable/* nova/app/src/main/res/drawable/ 2>/dev/null || true
+          
+          # Copy UI source code
+          mkdir -p nova/app/src/main/java/com/radiantbyte/novaclient/ui
+          cp -r protohax/app/src/main/java/dev/sora/protohax/ui/* nova/app/src/main/java/com/radiantbyte/novaclient/ui/
+      
+      - name: Update Package Names
+        run: |
+          cd nova
+          
+          # Update package declarations in Kotlin files
+          find app/src/main/java/com/radiantbyte/novaclient/ui -type f -name "*.kt" -exec sed -i 's/package dev\.sora\.protohax\.ui/package com.radiantbyte.novaclient.ui/g' {} \;
+          
+          # Update imports
+          find app/src/main/java/com/radiantbyte/novaclient/ui -type f -name "*.kt" -exec sed -i 's/import dev\.sora\.protohax/import com.radiantbyte.novaclient/g' {} \;
+          
+          # Update XML package references
+          find app/src/main/res -type f -name "*.xml" -exec sed -i 's/dev\.sora\.protohax/com.radiantbyte.novaclient/g' {} \;
+      
+      - name: Update build.gradle
+        run: |
+          cd nova
+          
+          # Backup original
+          cp app/build.gradle app/build.gradle.backup
+          
+          # Add Material Design 3 dependency if not exists
+          if ! grep -q "material:1.11.0" app/build.gradle; then
+            sed -i '/dependencies {/a\    implementation '\''com.google.android.material:material:1.11.0'\''' app/build.gradle
+          fi
+          
+          # Add ViewModel dependencies
+          if ! grep -q "lifecycle-viewmodel-ktx" app/build.gradle; then
+            sed -i '/dependencies {/a\    implementation '\''androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'\''' app/build.gradle
+            sed -i '/dependencies {/a\    implementation '\''androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'\''' app/build.gradle
+          fi
+          
+          # Add Navigation components
+          if ! grep -q "navigation-fragment-ktx" app/build.gradle; then
+            sed -i '/dependencies {/a\    implementation '\''androidx.navigation:navigation-fragment-ktx:2.7.5'\''' app/build.gradle
+            sed -i '/dependencies {/a\    implementation '\''androidx.navigation:navigation-ui-ktx:2.7.5'\''' app/build.gradle
+          fi
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat: Port ProtoHax UI to Nova Client'
+          branch: protohax-ui-port
+          title: 'Port ProtoHax UI'
+          body: |
+            This PR ports ProtoHax UI to Nova Client:
+            
+            - ✅ Copied layout files
+            - ✅ Copied themes and styles
+            - ✅ Copied UI source code
+            - ✅ Updated package names
+            - ✅ Added required dependencies
+            
+            **Manual steps needed:**
+            1. Update MainActivity to use ProtoHax UI
+            2. Test and fix any compilation errors
+            3. Adjust module system integration
+          path: nova

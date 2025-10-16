@@ -10,6 +10,7 @@ object TranslationManager {
     }
 
     private fun en() = buildMap {
+        put("elytrafly", "ElytraFly")
         put("fly", "Fly")
         put("no_clip", "No Clip")
         put("zoom", "Zoom")

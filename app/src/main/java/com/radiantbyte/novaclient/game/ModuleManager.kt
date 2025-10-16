@@ -16,6 +16,7 @@ import com.radiantbyte.novaclient.game.module.effect.BadOmenModule
 import com.radiantbyte.novaclient.game.module.effect.BlindnessModule
 import com.radiantbyte.novaclient.game.module.effect.ConduitPowerModule
 import com.radiantbyte.novaclient.game.module.effect.DarknessModule
+import com.radiantbyte.novaclient.game.module.motion.ElytraFlyModule
 import com.radiantbyte.novaclient.game.module.effect.FatalPoisonModule
 import com.radiantbyte.novaclient.game.module.effect.FireResistanceModule
 import com.radiantbyte.novaclient.game.module.effect.HasteModule
